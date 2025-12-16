@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dummy Payment — {{ course.title }}</title>
+  <style>
+    :root{
+      --bg:#f4f7ff;
+      --card:#fff;
+      --accent:#1f78b4;
+      --success:#2ecc71;
+      --fail:#e74c3c;
+      --muted:#666;
+    }
+    body{
+      font-family: Inter, Arial, sans-serif;
+      background: linear-gradient(180deg,var(--bg),#ffffff);
+      margin:0; padding:30px;
+      display:flex; align-items:center; justify-content:center; min-height:100vh;
+    }
+    .card{
+      width:100%; max-width:520px; background:var(--card);
+      border-radius:12px; box-shadow:0 8px 30px rgba(31,120,180,0.08);
+      padding:26px; text-align:center; transform:translateY(0);
+      transition:transform .28s ease, box-shadow .28s ease;
+    }
+    .card:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(31,120,180,0.12); }
+    h1{ margin:0 0 6px 0; font-size:20px; color:var(--accent); }
+    h2{ margin:4px 0 18px 0; font-size:18px; color:#111; }
+    .amount{
+      font-size:22px; font-weight:700; margin:6px 0 14px 0;
+    }
+    .muted{ color:var(--muted); margin-bottom:18px; }
+    .btns{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn{
+      padding:12px 18px; border-radius:10px; border:0; cursor:pointer;
+      font-weight:600; font-size:15px; min-width:170px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      transition: transform .12s ease;
+    }
+    .btn:active{ transform: translateY(2px); }
+    .success{ background:var(--success); color:#fff; }
+    .fail{ background:var(--fail); color:#fff; }
+    .link-small{ display:block; margin-top:14px; font-size:13px; color:var(--muted); text-decoration:none; }
+    .toggle-row{ display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:12px; }
+    .chip{ font-size:13px; padding:6px 10px; border-radius:999px; background:#f0f7ff; color:var(--accent); }
+    @media (max-width:480px){
+      .card{ padding:20px; border-radius:10px; }
+      .btn{ min-width:140px; font-size:14px; }
+    }
+    /* subtle pulse for success btn */
+    .success { animation: pulse 2.4s infinite; }
+    @keyframes pulse {
+      0% { box-shadow: 0 6px 18px rgba(46,204,113,0.18); }
+      50% { box-shadow: 0 18px 30px rgba(46,204,113,0.08); }
+      100% { box-shadow: 0 6px 18px rgba(46,204,113,0.18); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Dummy Payment Gateway</h1>
+    <h2>{{ course.title }}</h2>
+
+    <div class="amount">Amount: ₹{{ amount|floatformat:2 }}</div>
+    <div class="muted">Use these options to simulate a real checkout.</div>
+
+    <div class="btns">
+      <a href="{% url 'courses:dummy_payment_success' payment.id %}">
+        <button class="btn success">✔ Simulate Success</button>
+      </a>
+
+      <a href="{% url 'courses:dummy_payment_fail' payment.id %}">
+        <button class="btn fail">✖ Simulate Fail</button>
+      </a>
+    </div>
+
+    <div class="toggle-row">
+      <div class="chip">Mode: {% if use_dummy %}Dummy{% else %}Razorpay (real){% endif %}</div>
+      <div>
+        <a href="{% url 'courses:dummy_payment_history' %}" class="link-small">View Dummy Payment History</a>
+      </div>
+    </div>
+
+    {% if request.user.is_staff and settings.ALLOW_SESSION_PAYMENT_TOGGLE %}
+      <div style="margin-top:12px;">
+        <form action="{% url 'toggle_dummy_payment' %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="background:#fff;border:1px solid #ddd;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;">
+            Toggle Dummy Mode (staff)
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

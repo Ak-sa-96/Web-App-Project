@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}All Courses{% endblock %}
+{% block content %}
+
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-primary">All Courses</h1>
+    {% if user.is_authenticated %}
+      <p class="mb-0 text-muted">Welcome, {{ user.username }} 👋</p>
+    {% else %}
+      <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a>
+    {% endif %}
+  </div>
+
+  <!-- ⭐ Sorting + Category Filter -->
+  <form method="get" class="mb-4">
+    <select name="sort" onchange="this.form.submit()" class="form-select w-auto d-inline-block">
+      <option value="newest" {% if sort == "newest" %}selected{% endif %}>Newest</option>
+      <option value="oldest" {% if sort == "oldest" %}selected{% endif %}>Oldest</option>
+      <option value="az" {% if sort == "az" %}selected{% endif %}>A → Z</option>
+      <option value="za" {% if sort == "za" %}selected{% endif %}>Z → A</option>
+    </select>
+
+    <select name="category" onchange="this.form.submit()" class="form-select w-auto d-inline-block ms-2">
+      <option value="">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>
+          {{ cat }}
+        </option>
+      {% endfor %}
+    </select>
+  </form>
+  <!-- ⭐ END Sorting + Category -->
+
+  <div class="row g-4">
+    {% for course in courses %}
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100 shadow-sm border-0 rounded-3">
+
+          {% if course.thumbnail %}
+            <img src="{{ course.thumbnail.url }}" class="card-img-top rounded-top-3" alt="{{ course.title }}">
+          {% else %}
+            <img src="https://via.placeholder.com/400x200?text=No+Thumbnail" class="card-img-top rounded-top-3" alt="No Thumbnail">
+          {% endif %}
+
+          <div class="card-body">
+
+            <!-- Coming Soon Badge -->
+            {% if course.quiz_count == 0 %}
+              <span class="badge bg-warning text-dark mb-2">Coming Soon</span>
+            {% endif %}
+
+            <!-- Free Label -->
+            <span class="badge bg-success mb-2 ms-2">Free</span>
+
+            <h5 class="card-title text-primary fw-semibold">{{ course.title }}</h5>
+            <p class="card-text text-secondary">{{ course.description|truncatechars:100 }}</p>
+          </div>
+
+          <div class="card-footer bg-white border-0 pb-3 text-center">
+            <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-outline-primary w-75">
+              View Details
+            </a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center text-muted">No courses available yet.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

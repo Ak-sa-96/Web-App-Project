@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+
+          <h2 class="fw-bold mb-4 text-primary">Edit Profile</h2>
+
+          <form method="post" enctype="multipart/form-data" id="editProfileForm">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <!-- Profile Picture -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Profile Picture <span class="text-danger">*</span></label>
+              {{ form.profile_pic }}
+            </div>
+
+            <!-- Bio -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Bio <span class="text-danger">*</span></label>
+              {{ form.bio }}
+            </div>
+
+            <!-- Profession -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Profession <span class="text-danger">*</span></label>
+              {{ form.profession }}
+            </div>
+
+            <!-- Phone (Country code + phone) -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+
+              <div class="input-group">
+
+                <!-- Country code select -->
+                <select name="country_code" id="countryCode" class="form-select" style="max-width:140px;" required>
+                  {% for code, label in country_choices %}
+                    <option value="{{ code }}" {% if form.initial.country_code == code or profile.country_code == code %}selected{% endif %}>
+                      {{ label }}
+                    </option>
+                  {% endfor %}
+                </select>
+
+                <!-- Phone input -->
+                <input type="text"
+                       name="phone"
+                       id="phoneInput"
+                       value="{{ profile.phone|default:form.initial.phone }}"
+                       maxlength="12"
+                       class="form-control"
+                       placeholder="Enter phone number"
+                       required
+                       pattern="[0-9\-]+"
+                       title="Digits only">
+              </div>
+
+              <small class="text-muted">Only digits allowed — auto-format: 99999-99999</small>
+
+              <!-- OTP UI -->
+              <!-- <div class="mt-3">
+                {% if profile.phone %}
+                  {% if profile.phone_verified %}
+                    <span class="badge bg-success">Phone Verified ✔</span>
+                  {% else %}
+                    <button type="button" id="sendOtpBtn" class="btn btn-warning btn-sm">Send OTP</button>
+
+                    <div id="otpBox" class="mt-2" style="display:none;">
+                      <input type="text" id="otpInput" class="form-control w-50 d-inline-block" placeholder="Enter OTP">
+                      <button type="button" id="verifyOtpBtn" class="btn btn-success btn-sm ms-2">Verify OTP</button>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div> -->
+
+            <!-- Address -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Address <span class="text-danger">*</span></label>
+              {{ form.address }}
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// Phone auto-format
+const phoneInput = document.getElementById("phoneInput");
+if (phoneInput) {
+  phoneInput.addEventListener("input", function() {
+    let v = this.value.replace(/\D/g, "").slice(0,10);
+    if (v.length > 5) this.value = v.slice(0,5) + "-" + v.slice(5);
+    else this.value = v;
+  });
+}
+
+// OTP AJAX
+// const sendOtpBtn = document.getElementById("sendOtpBtn");
+// const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+
+// if (sendOtpBtn) {
+//   sendOtpBtn.addEventListener("click", () => {
+//     fetch("{% url 'users:send_otp' %}")
+//       .then(r => r.json())
+//       .then(data => {
+//         if (data.status === "sent") {
+//           alert("OTP sent! (Demo — check console)");
+//           document.getElementById("otpBox").style.display = "block";
+//         }
+//       });
+//   });
+// }
+
+// if (verifyOtpBtn) {
+//   verifyOtpBtn.addEventListener("click", () => {
+//     const otp = document.getElementById("otpInput").value;
+//     fetch("{% url 'users:verify_otp' %}?otp=" + encodeURIComponent(otp))
+//       .then(r => r.json())
+//       .then(data => {
+//         if (data.status === "verified") {
+//           alert("Phone verified! Reloading...");
+//           location.reload();
+//         } else {
+//           alert("Incorrect OTP.");
+//         }
+//       });
+//   });
+// }
+</script>
+
+{% endblock %}

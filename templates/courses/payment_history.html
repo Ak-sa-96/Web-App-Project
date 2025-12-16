@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+  <h3>Payment History</h3>
+  <table class="table">
+    <thead><tr><th>#</th><th>Course</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+    <tbody>
+      {% for p in payments %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ p.course.title }}</td>
+        <td>{{ p.amount_in_inr }} INR</td>
+        <td>{{ p.status }}</td>
+        <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No payments yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

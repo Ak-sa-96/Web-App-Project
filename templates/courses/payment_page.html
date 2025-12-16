@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Payment - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4">
+
+                    <h3 class="fw-bold text-primary mb-3">Complete Payment</h3>
+
+                    <!-- COURSE INFO -->
+                    <div class="mb-4">
+                        <h5 class="fw-semibold">{{ course.title }}</h5>
+                        <p class="text-muted">{{ course.description|truncatechars:150 }}</p>
+
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold">Amount:</span>
+                            <span class="fw-bold text-success">₹ {{ course.price_inr }}</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold">Order ID:</span>
+                            <span class="text-muted">{{ order.id }}</span>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center mt-4">
+                        <button id="rzp-button" class="btn btn-primary btn-lg px-4">
+                            Pay ₹{{ course.price_inr }} Now
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    var options = {
+        "key": "{{ razorpay_key_id }}",  // Razorpay Key ID
+        "amount": "{{ order.amount }}", // In paise
+        "currency": "INR",
+        "name": "LearnHub LMS",
+        "description": "Course Purchase",
+        "order_id": "{{ order.id }}",  // Razorpay Order ID
+
+        "handler": function (response) {
+            // After payment success → send data to callback
+            let formData = new FormData();
+            formData.append("razorpay_payment_id", response.razorpay_payment_id);
+            formData.append("razorpay_order_id", response.razorpay_order_id);
+            formData.append("razorpay_signature", response.razorpay_signature);
+
+            fetch("{% url 'courses:payment_callback' %}", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "paid") {
+                    alert("Payment successful! You are now enrolled.");
+                    window.location.href = "{% url 'courses:course_detail' course.id %}";
+                } else {
+                    alert("Payment failed: " + data.message);
+                }
+            });
+        },
+
+        "prefill": {
+            "name": "{{ request.user.username }}",
+            "email": "{{ request.user.email }}"
+        },
+        "theme": {
+            "color": "#0d6efd"
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+
+    document.getElementById('rzp-button').onclick = function (e) {
+        rzp1.open();
+        e.preventDefault();
+    };
+</script>
+
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+  <div class="row">
+
+    <!-- LEFT SIDE: LESSONS + QUIZ + PROGRESS (70%) -->
+    <div class="col-lg-8">
+
+      <!-- LESSONS CARD -->
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body p-4">
+
+          <h3 class="fw-bold text-dark mb-4">📘 Lessons</h3>
+
+          {% if lessons %}
+            <div class="accordion" id="lessonAccordion">
+
+              {% for lesson in lessons %}
+              <div class="accordion-item mb-2 rounded-3 shadow-lm">
+
+                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                  <button class="accordion-button collapsed fw-semibold"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#collapse{{ forloop.counter }}">
+                    {{ lesson.title }}
+                  </button>
+                </h2>
+
+                <div id="collapse{{ forloop.counter }}"
+                     class="accordion-collapse collapse"
+                     data-bs-parent="#lessonAccordion">
+
+                  <div class="accordion-body">
+
+                      <p class="text-muted">{{ lesson.content|linebreaks }}</p>
+
+                      {% if lesson.video %}
+                      <video controls class="w-100 mt-3 rounded shadow-sm">
+                        <source src="{{ lesson.video.url }}" type="video/mp4">
+                      </video>
+                      {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+          {% else %}
+            <p class="text-muted">No lessons available.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- QUIZ CARD -->
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body p-4">
+
+          <h3 class="fw-bold text-dark mb-3">🧠 Quizzes</h3>
+
+          {% if quizzes %}
+          <div class="list-group shadow-sm rounded-3">
+            {% for quiz in quizzes %}
+            <a href="{% url 'courses:quiz_detail' quiz.id %}"
+               class="list-group-item list-group-item-action py-3">
+              <strong>{{ quiz.title }}</strong>
+            </a>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-muted">No quizzes added yet.</p>
+          {% endif %}
+
+        </div>
+      </div>
+
+      <!-- PROGRESS CARD -->
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-body p-4">
+          <h3 class="fw-bold text-dark mb-3">📊 Your Progress</h3>
+          <p class="text-muted mb-4">
+            Completed {{ completed_lessons }} of {{ total_lessons }} lessons
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+
+
+    <!-- RIGHT SIDE: COURSE INFO CARD (30%) -->
+    <div class="col-lg-4">
+
+      <div class="card shadow-lg border-0 rounded-4 mb-4 text-center p-3">
+
+        <!-- Medium Image -->
+        {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}"
+             class="rounded-3  img-fluid"
+             style="width: 100%; max-height: auto; object-fit: cover;">
+        {% endif %}
+
+        <h4 class="fw-bold text-primary mt-2">{{ course.title }}</h4>
+
+        <p class="text-muted small px-2">{{ course.description }}</p>
+
+        <p class="text-secondary mt-2">
+          Instructor:
+          <strong>{{ course.instructor.username|default:"Not Assigned" }}</strong>
+        </p>
+
+        <hr>
+
+        {% if user.is_authenticated %}
+            {% if enrolled %}
+                <div class="alert alert-success py-2 rounded-3">
+                    ✅ Enrolled
+                </div>
+            {% else %}
+                {% if has_quiz %}
+                    <form method="post" action="{% url 'courses:enroll' course.pk %}">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="btn btn-primary px-4 rounded-3">
+                        Enroll Now
+                      </button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning py-2 rounded-3">
+                      🚧 Quiz not added yet
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}"
+               class="btn btn-outline-secondary px-4 rounded-3">
+              Login to Enroll
+            </a>
+        {% endif %}
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary px-4">
+      ← Back to Courses
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Payment Failed</title>
+  <style>
+    body{ font-family: Inter, Arial; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; background:#fff6f6; }
+    .wrap{ background:#fff; padding:26px; border-radius:12px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.06); }
+    h1{ color:#e74c3c; margin:0 0 8px 0; }
+    p{ margin:8px 0 16px 0; color:#333; }
+    a button{ padding:10px 16px; border-radius:10px; border:0; cursor:pointer; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>✖ Payment Failed</h1>
+    <p>Payment was marked as failed. You can try again.</p>
+    <a href="{% url 'courses:start_payment' payment.course.id %}"><button>Try Again</button></a>
+  </div>
+</body>
+</html>

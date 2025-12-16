@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dummy Payment History</title>
+  <style>
+    body{ font-family: Inter, Arial; padding:20px; background:#f8fbff; }
+    .container{ max-width:980px; margin:0 auto; }
+    h1{ color:#1f4e79; }
+    table{ width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.04); }
+    th,td{ padding:12px 14px; text-align:left; border-bottom:1px solid #f0f4fb; font-size:14px; }
+    th{ background:linear-gradient(90deg,#f0f6ff,#fff); font-weight:700; }
+    .status-paid{ color:#2ecc71; font-weight:700; }
+    .status-failed{ color:#e74c3c; font-weight:700; }
+    @media (max-width:640px){
+      th,td{ padding:10px; font-size:13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your Dummy Payment History</h1>
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Course</th><th>Amount</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+          <tr>
+            <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ p.course.title }}</td>
+            <td>₹{{ p.amount_in_inr }}</td>
+            <td>
+              {% if p.status == "paid" %}
+                <span class="status-paid">Paid</span>
+              {% elif p.status == "failed" %}
+                <span class="status-failed">Failed</span>
+              {% else %}
+                {{ p.status }}
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" style="text-align:center;padding:18px;">No dummy payments yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

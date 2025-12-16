@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Enrollment Required{% endblock %}
+{% block content %}
+  <div style="border:1px solid #ccc; padding:20px; border-radius:8px;">
+    <h2>Enrollment Required</h2>
+    <p>You must enroll in the course to take this quiz.</p>
+    {% if course %}
+      <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-primary">Go to Course</a>
+    {% else %}
+      <a href="{% url 'courses:course_list' %}" class="btn btn-primary">View All Courses</a>
+    {% endif %}
+  </div>
+{% endblock %}

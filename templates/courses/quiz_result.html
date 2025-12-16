@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Quiz Result - {{ quiz.title }}{% endblock %}
+{% block content %}
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card shadow-lg border-0 rounded-4 text-center">
+        <div class="card-body p-5">
+          <h2 class="fw-bold text-primary mb-4">{{ quiz.title }}</h2>
+
+          <h4 class="mb-3">Your Score</h4>
+          <div class="display-4 fw-bold text-success">
+            {{ score }} / {{ total }}
+          </div>
+
+          <hr class="my-4">
+
+          {% with percent=score|divisibleby:total %}
+          {% if score >= total|divisibleby:2 %}
+            <div class="alert alert-success fs-5">
+              🎉 Excellent work! You passed this quiz.
+            </div>
+          {% elif score > 0 %}
+            <div class="alert alert-warning fs-5">
+              ⚡ You did okay — keep learning and try again!
+            </div>
+          {% else %}
+            <div class="alert alert-danger fs-5">
+              ❌ Don’t worry — review the lessons and retake the quiz!
+            </div>
+          {% endif %}
+          {% endwith %}
+
+          <div class="mt-4">
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary me-2">
+              <i class="bi bi-house-door"></i> Back to Courses
+            </a>
+            <a href="{% url 'courses:my_results' %}" class="btn btn-primary">
+              <i class="bi bi-bar-chart"></i> View My Results
+            </a>
+          </div>
+
+          <!-- ⭐ Download Certificate Button -->
+          <div class="text-center mt-4">
+            <a href="{% url 'courses:download_certificate' quiz.course.id %}" 
+               class="btn btn-success btn-lg">
+              <i class="bi bi-file-earmark-pdf"></i> Download Certificate
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
